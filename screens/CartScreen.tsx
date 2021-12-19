@@ -1,18 +1,20 @@
 import * as React from 'react';
 import { ActivityIndicator, FlatList, StyleSheet } from 'react-native';
+
 import { Text, View } from '../components/Themed';
 import { useQuery } from 'urql';
-import {Product} from '../components/Product'
-import { PRODUCTS_QUERY } from '../graphql/queries';
+import { AllCartQuery, AllCartQueryVariables } from '../types';
+import { Product } from '../components/Product';
+import { CART_QUERY } from '../graphql/queries';
 
-export const HomeScreen: React.FC = () => {
-  const [{ data, error, fetching }, refreshProducts] = useQuery({ query: PRODUCTS_QUERY });
+export const CartScreen: React.FC = () => {
+  const [{ data, error, fetching }, refreshFavorites] = useQuery<AllCartQuery, AllCartQueryVariables>({ query: CART_QUERY });
   const [isRefreshing, SetIsRefreshing] = React.useState(false);
 
-  const handleRefreshProducts = React.useCallback(() => {
+  const handleRefreshCart = React.useCallback(() => {
     SetIsRefreshing(true);
-    refreshProducts({ requestPolicy: 'network-only'});
-  }, [refreshProducts]);
+    refreshFavorites({ requestPolicy: 'network-only'});
+  }, [refreshFavorites]);
 
   React.useEffect(() => {
     if(!fetching) {
@@ -38,18 +40,13 @@ export const HomeScreen: React.FC = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.name}>Our Products</Text>
-      <FlatList 
-        style={styles.flatList}
-        data={data?.products}
+      <FlatList data={data?.shoppingCart}
         refreshing={isRefreshing}
-        onRefresh={handleRefreshProducts}
+        onRefresh={handleRefreshCart}
         keyExtractor={item => item.id}
-        numColumns={2}
+        ItemSeparatorComponent ={() => <View style= {styles.separator}/>}
         renderItem={({ item }) => (
-          <View style={styles.gridViewBlockStyle}>
-         <Product item={item} cta='add'/>
-         </View>
+          <Product item={item.product} cta='remove'/>
         )}
       />
     </View>
@@ -59,28 +56,25 @@ export const HomeScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    margin: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   name: {
     fontSize: 24,
     fontWeight: '400',
     textTransform: 'uppercase',
     letterSpacing: 2,
-    marginBottom: 10,
-    textAlign: 'center'
+    marginBottom: 10
   },
-  flatList: {
-    marginBottom: 80
+  author: {
+    fontSize: 18,
+    color: 'lightgray',
   },
-  gridViewBlockStyle: {
-    justifyContent: 'center',
-    flex:1,
-    alignItems: 'center',
-    height: 300,
-    width: 200,
-    padding: 10,
-    borderRadius: 40,
-    margin: 10,
-    backgroundColor: 'white'
-  }
+  separator: {
+    marginVertical: 14,
+    marginHorizontal: 10,
+    height: 1,
+    backgroundColor: 'white',
+    width: '90%'
+  },
 });

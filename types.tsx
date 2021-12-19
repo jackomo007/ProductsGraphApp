@@ -68,6 +68,7 @@ export type Product = {
   id: Scalars['ID'];
   name: Scalars['String'];
   favoriteId?: Maybe<Scalars['String']>;
+  shoppingCartId?: Maybe<Scalars['String']>;
   description?: Maybe<Scalars['String']>;
   image: Scalars['String'];
   price: Scalars['String'];
@@ -91,6 +92,24 @@ export type AllFavoriteMutation = {
   | undefined;
 };
 
+export type AllCartMutationVariables = Exact<{ productId: Scalars['ID'] }>
+
+export type AllCartMutation = {
+  __typename?: 'Mutation'
+  addFavorite?:
+  | {
+    __typename?: 'ShoppingCart';
+    id: string;
+    product: {
+      __typename: 'Product';
+      id: string;
+      name: string;
+    };
+  }
+  | null
+  | undefined;
+};
+
 export type ProductSummaryFieldsFragment = {
   __typename?: 'Product';
   id: string;
@@ -98,6 +117,7 @@ export type ProductSummaryFieldsFragment = {
   price: string;
   image: string;
   favoriteId?: string | null | undefined;
+  shoppingCartId?: string | null | undefined;
 }
 
 export type AllProductsQueryVariables = Exact<{ [key: string]: never }>
@@ -106,6 +126,8 @@ export type Mutation = {
   __typename?: 'Mutation';
   addFavorite?: Maybe<Favorite>;
   removeFavorite?: Maybe<Scalars['Boolean']>;
+  addToCart?: Maybe<ShoppingCart>;
+  removeFromCart?: Maybe<Scalars['Boolean']>;
 }
 
 export type MutationAddFavoriteArgs = {
@@ -136,7 +158,42 @@ export type AllFavoritesQuery = {
       name: string;
       price: string;
       image: string;
-      favoritemarId?: string | null | undefined;
+      favoriteId?: string | null | undefined;
+    };
+  }>
+  | null
+  | undefined;
+};
+
+export type MutationAddCartArgs = {
+  ProductId: Scalars['ID']
+}
+
+export type MutationRemoveCartArgs = {
+  shoppingCartId: Scalars['ID']
+}
+
+export type ShoppingCart = {
+  __typename?: 'ShoppingCart';
+  id: Scalars['ID'];
+  product: Product;
+}
+
+export type AllCartQueryVariables = Exact<{ [key: string]: never }>
+
+export type AllCartQuery = {
+  __typename?: 'Query'
+  shoppingCart?:
+  Array<{
+    __typename?: 'ShoppingCart';
+    id: string;
+    product: {
+      __typename: 'Product';
+      id: string;
+      name: string;
+      price: string;
+      image: string;
+      shoppingCartId?: string | null | undefined;
     };
   }>
   | null

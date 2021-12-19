@@ -7,5 +7,6 @@ export const ProductSummaryFields = gql`
         image
         price
         favoriteId
+        shoppingCartId
     }
 `;

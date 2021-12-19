@@ -2,23 +2,11 @@ import * as React from 'react';
 import { ActivityIndicator, FlatList, StyleSheet } from 'react-native';
 
 import { Text, View } from '../components/Themed';
-import { gql, useQuery } from 'urql';
-import { ProductSummaryFields } from '../graphql/fragments';
+import { useQuery } from 'urql';
 import { AllFavoritesQuery, AllFavoritesQueryVariables } from '../types';
 import { Product } from '../components/Product';
+import { FAVORITES_QUERY } from '../graphql/queries';
 
-const FAVORITES_QUERY = gql`
-  query AllFavorites {
-    favorites {
-      id
-      product {
-        ...ProductSummaryFields
-      }
-    }
-
-    ${ProductSummaryFields}
-  }
-`;
 
 export const FavoritesScreen: React.FC = () => {
   const [{ data, error, fetching }, refreshFavorites] = useQuery<AllFavoritesQuery, AllFavoritesQueryVariables>({ query: FAVORITES_QUERY });
@@ -53,7 +41,6 @@ export const FavoritesScreen: React.FC = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.name}>Products Favorites</Text>
       <FlatList data={data?.favorites}
         refreshing={isRefreshing}
         onRefresh={handleRefreshFavorites}

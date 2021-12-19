@@ -21,7 +21,7 @@ const linking: LinkingOptions<RootStackParamList> = {
           },
           ShoppingCart: {
             screens: {
-              FavoritesScreen: 'three',
+              CartScreen: 'three',
             },
           },
         },

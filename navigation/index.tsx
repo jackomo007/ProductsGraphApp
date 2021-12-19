@@ -1,10 +1,10 @@
-import { FontAwesome } from '@expo/vector-icons';
+import * as React from 'react';
+import { ColorSchemeName, StyleSheet, Text, View, TouchableOpacity, Image } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { NavigationContainer, DefaultTheme, DarkTheme } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import * as React from 'react';
-import { ColorSchemeName } from 'react-native';
-
+import {Pressable} from 'react-native';
+import { AntDesign } from '@expo/vector-icons';
 import Colors from '../constants/Colors';
 import useColorScheme from '../hooks/useColorScheme';
 import { ProductDetailsModalScreen } from '../screens/ProductDetailsModalScreen';
@@ -13,6 +13,7 @@ import { HomeScreen } from '../screens/HomeScreen';
 import { FavoritesScreen } from '../screens/FavoritesScreen';
 import { RootStackParamList, RootTabParamList, RootTabScreenProps } from '../types';
 import LinkingConfiguration from './LinkingConfiguration';
+import { CartScreen } from '../screens/CartScreen';
 
 export default function Navigation({ colorScheme }: { colorScheme: ColorSchemeName }) {
   return (
@@ -33,10 +34,31 @@ function RootNavigator() {
       <Stack.Screen name="NotFound" component={NotFoundScreen} />
       <Stack.Screen name="ProductDetailsModal" component={ProductDetailsModalScreen} options={({ route }) => ({
         presentation: 'modal',
-        name: route.params.name
+        title: route.params.name
       })} />
     </Stack.Navigator>
   );
+}
+
+const CustomTabBarButton: any = (props: any) => {
+  return <TouchableOpacity
+    style={{
+      top: -30,
+      justifyContent: 'center',
+      alignItems: 'center',
+      ...styles.shadow
+    }}
+    onPress={props.onPress}
+  >
+    <View style={{
+      width: 70,
+      height: 70,
+      borderRadius: 35,
+      backgroundColor: '#4630EB'
+    }}>
+      {props.children}
+    </View>
+  </TouchableOpacity>
 }
 
 const BottomTab = createBottomTabNavigator<RootTabParamList>();
@@ -49,36 +71,98 @@ function BottomTabNavigator() {
       initialRouteName="Home"
       screenOptions={{
         tabBarActiveTintColor: Colors[colorScheme].tint,
+        tabBarShowLabel: false,
+        tabBarStyle: {
+          position: 'absolute',
+          bottom: 25,
+          left: 20,
+          right: 20,
+          backgroundColor: '#fff',
+          borderRadius: 15,
+          height: 80,
+          ...styles.shadow
+        }
       }}>
       <BottomTab.Screen
         name="Home"
         component={HomeScreen}
         options={({ navigation }: RootTabScreenProps<'Home'>) => ({
-          name: 'Home',
-          tabBarIcon: ({ color }) => <TabBarIcon name="home" color={color} />,
+          title: 'TACTICHOP',
+          headerRight: () => (
+            <TouchableOpacity >
+                <Image style={{width: 40, height: 40, marginTop: 10, marginRight: 10}} source={require('../assets/images/icons/search.png')}/>
+            </TouchableOpacity>
+        ),
+          headerTitleAlign: 'center',
+          tabBarIcon: ({ focused }) => (
+            <View style={{ alignItems: 'center', justifyContent: 'center', top: 10 }} >
+              <Image
+                source={require('../assets/images/icons/home.png')}
+                resizeMode='contain'
+                style={{
+                  width: 25,
+                  height: 25,
+                  tintColor: focused ? '#4630EB' : '#748c94'
+                }}
+              />
+              <Text style={{ color: focused ? '#4630EB' : '#748c94', fontSize: 12 }}>HOME</Text>
+            </View>
+          ),
         })}
+      />
+      <BottomTab.Screen
+        name="ShoppingCart"
+        component={CartScreen}
+        options={{
+          tabBarIcon: ({ focused }) => (
+            <Image
+              source={require('../assets/images/icons/cart.png')}
+              resizeMode='contain'
+              style={{
+                width: 30,
+                height: 30,
+                tintColor: '#fff'
+              }}
+            />
+          ),
+          tabBarButton: (props) => (
+            <CustomTabBarButton {...props} />
+          )
+        }}
       />
       <BottomTab.Screen
         name="Favorites"
         component={FavoritesScreen}
-        options={{
-          tabBarIcon: ({ color }) => <TabBarIcon name="heart" color={color} />,
-        }}
-      />
-       <BottomTab.Screen
-        name="ShoppingCart"
-        component={FavoritesScreen}
-        options={{
-          tabBarIcon: ({ color }) => <TabBarIcon name="shopping-cart" color={color} />,
-        }}
+        options={({ navigation }: RootTabScreenProps<'Favorites'>) => ({
+          tabBarIcon: ({ focused }) => (
+            <View style={{ alignItems: 'center', justifyContent: 'center', top: 10 }} >
+              <Image
+                source={require('../assets/images/icons/favorites.png')}
+                resizeMode='contain'
+                style={{
+                  width: 25,
+                  height: 25,
+                  tintColor: focused ? '#e32f45' : '#748c94'
+                }}
+              />
+              <Text style={{ color: focused ? '#e32f45' : '#748c94', fontSize: 12 }}>FAVORITES</Text>
+            </View>
+          ),
+        })}
       />
     </BottomTab.Navigator>
   );
 }
 
-function TabBarIcon(props: {
-  name: React.ComponentProps<typeof FontAwesome>['name'];
-  color: string;
-}) {
-  return <FontAwesome size={30} style={{ marginBottom: -3 }} {...props} />;
-}
+const styles = StyleSheet.create({
+  shadow: {
+    shadowColor: '#7F5DF0',
+    shadowOffset: {
+      width: 0,
+      height: 0
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.5,
+    elevation: 5,
+  }
+})
